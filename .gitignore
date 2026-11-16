@@ -1,0 +1,33 @@
+# ── Python / Django ──
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+db.sqlite3
+staticfiles/
+*.log
+
+# ── Node / Vite ──
+node_modules/
+frontend/dist/
+npm-debug.log*
+*.local
+
+# ── Entorno y secretos ──
+.env
+.env.*
+
+# ── Sistema / editores ──
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.code-workspace
+
+# ── Backups y artefactos del proyecto original (no van al repo) ──
+*.sql
+*.tar.gz
+base-backup/
+wal-archive/
+build/
