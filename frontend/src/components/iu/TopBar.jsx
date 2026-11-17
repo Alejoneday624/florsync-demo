@@ -1,11 +1,12 @@
-import { Menu, RotateCcw } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { Menu, RotateCcw, Home } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import api from "../../api/axios";
 import routeTitles from "../../data/routeTitles";
 
 export default function TopBar({ toggleSidebar }) {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [openMenu, setOpenMenu] = useState(false);
   const [reseteando, setReseteando] = useState(false);
@@ -91,6 +92,14 @@ export default function TopBar({ toggleSidebar }) {
             >
               <RotateCcw size={16} />
               {reseteando ? "Restableciendo..." : "Restablecer datos"}
+            </button>
+
+            <button
+              onClick={() => navigate("/")}
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 transition flex items-center gap-2 border-t"
+            >
+              <Home size={16} />
+              Volver al inicio
             </button>
           </div>
         )}

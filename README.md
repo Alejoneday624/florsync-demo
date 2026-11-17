@@ -20,6 +20,9 @@ inventario, ventas, clientes, categorías y un dashboard con gráficas.
 
 ## Funcionalidades
 
+- **Pantalla de inicio** — misma estética que la versión completa (carrusel de flores
+  y card con el nombre de la app), pero con un botón **"PROBAR DEMO"** en lugar de
+  login: un clic y entras al sistema.
 - **Dashboard** — resumen de ventas, gráfica diaria/semanal/mensual, productos más
   vendidos, ventas por vendedor y alerta de stock bajo.
 - **Inventario** — CRUD de productos con búsqueda, filtro por categoría y ajuste de stock.
@@ -55,8 +58,12 @@ npm install
 npm run dev
 ```
 
-Abre **http://localhost:5173** — redirige al dashboard. El proxy de Vite envía
+Abre **http://localhost:5173** — aparece la pantalla de inicio con el botón
+**"PROBAR DEMO"**; un clic te lleva al dashboard. El proxy de Vite envía
 `/api` al backend, así que no hace falta configurar nada más.
+
+Para volver a la pantalla de inicio desde dentro de la app, abre el menú `?`
+de la barra superior y elige **"Volver al inicio"**.
 
 ## Endpoints principales
 
@@ -83,8 +90,8 @@ florsync-demo/
 │   └── manage.py
 ├── frontend/
 │   └── src/
-│       ├── pages/             # Dashboard, Inventario, Ventas, Clientes, Categorías
-│       ├── components/iu/     # tablas, modales, gráficas, sidebar, topbar
+│       ├── pages/             # Landing, Dashboard, Inventario, Ventas, Clientes, Categorías
+│       ├── components/iu/     # tablas, modales, gráficas, carrusel, sidebar, topbar
 │       ├── api/               # cliente Axios
 │       └── data/              # menú y títulos de ruta
 └── README.md
