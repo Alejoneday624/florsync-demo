@@ -1,0 +1,28 @@
+# render.yaml — Blueprint de Render para FlorSync Demo
+# Frontend: Vercel (proyecto separado, raíz = frontend/)
+# Base de datos: Supabase (DATABASE_URL se pega manualmente en el dashboard)
+
+services:
+  - type: web
+    name: florsync-demo-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: >-
+      pip install -r requirements.txt &&
+      python manage.py migrate &&
+      python manage.py seed_demo &&
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn florsync.wsgi:application --bind 0.0.0.0:$PORT
+    healthCheckPath: /health
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: florsync-demo-api.onrender.com
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: DATABASE_URL
+        sync: false   # pegar el connection string de Supabase en el dashboard de Render

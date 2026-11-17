@@ -14,9 +14,10 @@ inventario, ventas, clientes, categorías y un dashboard con gráficas.
 | Capa | Tecnología |
 |------|------------|
 | Backend | Python · Django 5.1 · Django REST Framework |
-| Base de datos | SQLite (cero configuración) |
+| Base de datos | SQLite en local · **Supabase (PostgreSQL)** en producción |
 | Frontend | React 19 · Vite · Tailwind CSS 4 · Recharts · Framer Motion |
 | Comunicación | Axios con proxy de Vite (`/api` → `localhost:8000`) |
+| Despliegue | **Vercel** (frontend) · **Render** (backend) |
 
 ## Funcionalidades
 
@@ -65,6 +66,49 @@ Abre **http://localhost:5173** — aparece la pantalla de inicio con el botón
 Para volver a la pantalla de inicio desde dentro de la app, abre el menú `?`
 de la barra superior y elige **"Volver al inicio"**.
 
+> **Atajo:** `start-dev.ps1` en la raíz del proyecto levanta backend y frontend
+> a la vez en dos ventanas (doble clic).
+
+## Despliegue en producción
+
+Arquitectura: **Vercel** (frontend) + **Render** (backend) + **Supabase** (PostgreSQL).
+
+### 1. Supabase — base de datos
+
+1. Crea un proyecto en [supabase.com](https://supabase.com) (tier gratis).
+2. En **Project Settings → Database**, copia el *Connection string* (URI) del
+   **pooler** (puerto `6543`, no el directo).
+
+### 2. Render — backend
+
+El repo trae un **Blueprint** (`render.yaml`) que define todo el servicio:
+
+1. En [render.com](https://render.com) → **New → Blueprint** → conecta tu repo de GitHub.
+2. Render lee `render.yaml` y crea el servicio `florsync-demo-api`.
+3. En **Environment → DATABASE_URL**, pega el connection string de Supabase.
+   > El build ejecuta `migrate` + `seed_demo`, así que cada deploy deja la demo
+   > con sus datos de ejemplo (idempotente, no duplica).
+
+Variables ya definidas en el blueprint: `DJANGO_DEBUG=false`,
+`DJANGO_SECRET_KEY` (generado), `ALLOWED_HOSTS`, `PYTHON_VERSION`.
+
+### 3. Vercel — frontend
+
+1. Crea un proyecto en [vercel.com](https://vercel.com) importando el repo.
+2. **Root Directory:** `frontend` · Framework: **Vite** (detectado solo).
+3. Env var: `VITE_API_URL=https://florsync-demo-api.onrender.com/api/`
+4. Deploy. El `frontend/vercel.json` incluye el rewrite SPA para que las rutas
+   (`/dashboard`, `/inventario`…) no den 404 al recargar.
+
+### Variables de entorno del backend
+
+| Variable | Local (default) | Producción |
+|----------|-----------------|------------|
+| `DJANGO_SECRET_KEY` | insegura (dev) | generada por Render |
+| `DJANGO_DEBUG` | `true` | `false` |
+| `ALLOWED_HOSTS` | `*` | dominio `.onrender.com` |
+| `DATABASE_URL` | ausente → SQLite | connection string de Supabase |
+
 ## Endpoints principales
 
 | Método | Ruta | Descripción |
@@ -82,18 +126,21 @@ de la barra superior y elige **"Volver al inicio"**.
 ```
 florsync-demo/
 ├── backend/
-│   ├── florsync/              # configuración Django (SQLite, sin JWT)
+│   ├── florsync/              # configuración Django (env vars, SQLite/Supabase)
 │   ├── api/                   # categorías + reset de la demo
 │   ├── productos/             # modelos y API de productos
 │   ├── clientes/              # modelos y API de clientes
 │   ├── ventas/                # modelos, API de ventas y dashboard
 │   └── manage.py
 ├── frontend/
+│   ├── vercel.json            # rewrite SPA para Vercel
 │   └── src/
 │       ├── pages/             # Landing, Dashboard, Inventario, Ventas, Clientes, Categorías
 │       ├── components/iu/     # tablas, modales, gráficas, carrusel, sidebar, topbar
 │       ├── api/               # cliente Axios
 │       └── data/              # menú y títulos de ruta
+├── render.yaml                # Blueprint de Render (backend)
+├── start-dev.ps1              # levanta backend + frontend en local
 └── README.md
 ```
 

@@ -2,7 +2,8 @@
 Django settings for FlorSync Demo.
 
 Version simplificada para portafolio:
-  - Base de datos SQLite (sin Docker ni PostgreSQL)
+  - Local: SQLite (cero configuracion)
+  - Produccion (Render): PostgreSQL de Supabase via DATABASE_URL
   - Sin autenticacion JWT (la demo es publica)
   - Sin apps de usuarios ni auditoria
 """
@@ -10,13 +11,23 @@ Version simplificada para portafolio:
 import os
 from pathlib import Path
 
+import dj_database_url
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-florsync-demo-key-change-me-in-production'
+# Seguridad por variable de entorno (con defaults para correr la demo en local)
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-florsync-demo-key-change-me-in-production',
+)
+DEBUG = os.environ.get('DJANGO_DEBUG', 'true').lower() == 'true'
 
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+# Lista separada por comas; en produccion: "florsync-demo-api.onrender.com"
+ALLOWED_HOSTS = [
+    h.strip()
+    for h in os.environ.get('ALLOWED_HOSTS', '*').split(',')
+    if h.strip()
+]
 
 # Application definition
 
@@ -66,13 +77,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'florsync.wsgi.application'
 
-# Database — SQLite, cero configuracion para correr la demo
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Database — SQLite en local; DATABASE_URL (Supabase) en produccion
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        )
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation (solo por defecto de Django, no se usa en la demo)
 AUTH_PASSWORD_VALIDATORS = []
