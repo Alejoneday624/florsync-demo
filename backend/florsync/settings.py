@@ -77,15 +77,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'florsync.wsgi.application'
 
-# Database — SQLite en local; DATABASE_URL (Supabase) en produccion
-if os.environ.get('DATABASE_URL'):
+# Database — SQLite en local; DATABASE_URL (Supabase/PostgreSQL) en produccion
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.config(
-            conn_max_age=600,
+            default=DATABASE_URL,
+            conn_max_age=int(os.environ.get('DB_CONN_MAX_AGE', '0')),
             conn_health_checks=True,
-            ssl_require=True,
+            ssl_require=not DEBUG,
         )
     }
+    # Recomendado para Supabase pooler (transaction mode, puerto 6543)
+    DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
 else:
     DATABASES = {
         'default': {
