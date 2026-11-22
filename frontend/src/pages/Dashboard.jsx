@@ -36,8 +36,9 @@ export default function Dashboard() {
         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-red-700">
           <h2 className="font-bold mb-2">No se pudieron cargar los datos</h2>
           <p className="text-sm">
-            ¿Está corriendo el backend? Inicia el servidor Django en{" "}
-            <code className="bg-red-100 px-1 rounded">http://127.0.0.1:8000</code>
+            No se pudo conectar con el API. Verifica que el backend esté en ejecución
+            y que <code className="bg-red-100 px-1 rounded">VITE_API_URL</code> apunte
+            a la URL correcta.
           </p>
           <button
             onClick={() => window.location.reload()}
